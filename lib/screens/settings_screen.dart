@@ -15,7 +15,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   void _showDeleteAllDialog() {
     showDialog(
       context: context,
-      builder: (_) => AlertDialog(
+      useRootNavigator: false,
+      builder: (context) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: const Row(
           children: [
@@ -29,13 +30,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.of(context).pop(),
+            onPressed: () {
+              if (!mounted)
+                return; // Prevent using context after widget disposed
+              Navigator.of(context).pop();
+            },
             child: const Text('Cancel'),
           ),
           ElevatedButton(
             onPressed: () {
               notesBox.clear();
+              if (!mounted) return;
               Navigator.of(context).pop();
+              if (!mounted) return;
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
                   content: Text('All notes deleted!'),
@@ -44,7 +51,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
               );
             },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            child: const Text('Delete All', style: TextStyle(color: Colors.white)),
+            child: const Text(
+              'Delete All',
+              style: TextStyle(color: Colors.white),
+            ),
           ),
         ],
       ),
@@ -54,7 +64,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   void _showAboutDialog() {
     showDialog(
       context: context,
-      builder: (_) => AlertDialog(
+      useRootNavigator: false,
+      builder: (context) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: const Row(
           children: [
@@ -69,7 +80,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
           children: [
             Text('Version: 1.0.0'),
             SizedBox(height: 8),
-            Text('A beautiful and feature-rich note-taking app built with Flutter.'),
+            Text(
+              'A beautiful and feature-rich note-taking app built with Flutter.',
+            ),
             SizedBox(height: 16),
             Text('Features:'),
             SizedBox(height: 8),
@@ -84,7 +97,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.of(context).pop(),
+            onPressed: () {
+              if (!mounted) return;
+              Navigator.of(context).pop();
+            },
             child: const Text('Close'),
           ),
         ],
@@ -176,7 +192,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         onTap: () {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
-                              content: Text('Share functionality would open here'),
+                              content: Text(
+                                'Share functionality would open here',
+                              ),
                             ),
                           );
                         },
@@ -205,7 +223,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     valueListenable: notesBox.listenable(),
                     builder: (context, Box<Note> box, _) {
                       final totalNotes = box.length;
-                      final totalWords = box.values.fold<int>(0, (sum, note) => sum + note.wordCount);
+                      final totalWords = box.values.fold<int>(
+                        0,
+                        (sum, note) => sum + note.wordCount,
+                      );
 
                       return Column(
                         children: [
@@ -224,7 +245,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           _buildInfoTile(
                             icon: Icons.storage,
                             title: 'Database Size',
-                            value: '${(totalWords * 6 / 1024).toStringAsFixed(1)} KB', // Rough estimate
+                            value:
+                                '${(totalWords * 6 / 1024).toStringAsFixed(1)} KB', // Rough estimate
                           ),
                         ],
                       );
@@ -257,7 +279,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         onTap: () {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
-                              content: Text('Export functionality would be implemented here'),
+                              content: Text(
+                                'Export functionality would be implemented here',
+                              ),
                               backgroundColor: Colors.blue,
                             ),
                           );
@@ -271,7 +295,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         onTap: () {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
-                              content: Text('Import functionality would be implemented here'),
+                              content: Text(
+                                'Import functionality would be implemented here',
+                              ),
                               backgroundColor: Colors.green,
                             ),
                           );
@@ -314,7 +340,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         onTap: () {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
-                              content: Text('GitHub repository would open here'),
+                              content: Text(
+                                'GitHub repository would open here',
+                              ),
                             ),
                           );
                         },
@@ -340,7 +368,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         onTap: () {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
-                              content: Text('Feature request form would open here'),
+                              content: Text(
+                                'Feature request form would open here',
+                              ),
                             ),
                           );
                         },
@@ -358,7 +388,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       Container(
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: Theme.of(context).primaryColor.withOpacity(0.1),
+                          color: Theme.of(
+                            context,
+                          ).primaryColor.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Column(
@@ -446,10 +478,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ),
       subtitle: Text(
         subtitle,
-        style: TextStyle(
-          fontSize: 13,
-          color: Colors.grey.shade600,
-        ),
+        style: TextStyle(fontSize: 13, color: Colors.grey.shade600),
       ),
       trailing: Icon(
         Icons.arrow_forward_ios,
@@ -473,11 +502,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           color: Theme.of(context).primaryColor.withOpacity(0.1),
           borderRadius: BorderRadius.circular(8),
         ),
-        child: Icon(
-          icon,
-          color: Theme.of(context).primaryColor,
-          size: 20,
-        ),
+        child: Icon(icon, color: Theme.of(context).primaryColor, size: 20),
       ),
       title: Text(
         title,
