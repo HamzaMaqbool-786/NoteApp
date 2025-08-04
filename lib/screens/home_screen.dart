@@ -21,7 +21,14 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   String selectedCategory = 'All';
   bool isGridView = false;
 
-  final List<String> categories = ['All', 'Personal', 'Work', 'Ideas', 'Tasks', 'Other'];
+  final List<String> categories = [
+    'All',
+    'Personal',
+    'Work',
+    'Ideas',
+    'Tasks',
+    'Other',
+  ];
   final List<Color> noteColors = [
     const Color(0xFFFFD54F), // Amber
     const Color(0xFF81C784), // Light Green
@@ -41,7 +48,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       vsync: this,
     );
     _fabScaleAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _fabAnimationController, curve: Curves.elasticOut),
+      CurvedAnimation(
+        parent: _fabAnimationController,
+        curve: Curves.elasticOut,
+      ),
     );
     _fabAnimationController.forward();
   }
@@ -57,16 +67,18 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     final titleController = TextEditingController(text: note?.title ?? "");
     final descController = TextEditingController(text: note?.description ?? "");
     String selectedNoteCategory = note?.category ?? 'Personal';
-    Color selectedColor = note != null ?
-    Color(note.colorValue ?? noteColors.first.value) :
-    noteColors.first;
+    Color selectedColor = note != null
+        ? Color(note.colorValue ?? noteColors.first.value)
+        : noteColors.first;
 
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (_) => StatefulBuilder(
         builder: (context, setDialogState) => AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
           title: Row(
             children: [
               Icon(
@@ -124,7 +136,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
                 // Category Dropdown
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(color: Colors.grey.shade300),
@@ -151,7 +166,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 const SizedBox(height: 16),
 
                 // Color Selection
-                const Text('Choose Color:', style: TextStyle(fontWeight: FontWeight.w600)),
+                const Text(
+                  'Choose Color:',
+                  style: TextStyle(fontWeight: FontWeight.w600),
+                ),
                 const SizedBox(height: 8),
                 Wrap(
                   spacing: 8,
@@ -169,7 +187,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                           color: color,
                           shape: BoxShape.circle,
                           border: Border.all(
-                            color: selectedColor == color ? Colors.black : Colors.transparent,
+                            color: selectedColor == color
+                                ? Colors.black
+                                : Colors.transparent,
                             width: 2,
                           ),
                         ),
@@ -220,13 +240,17 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text(note == null ? 'Note created!' : 'Note updated!'),
+                    content: Text(
+                      note == null ? 'Note created!' : 'Note updated!',
+                    ),
                     backgroundColor: Colors.green,
                   ),
                 );
               },
               style: ElevatedButton.styleFrom(
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
               ),
               child: const Text('Save'),
             ),
@@ -239,7 +263,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   void deleteNote(Note note) {
     showDialog(
       context: context,
-      builder: (_) => AlertDialog(
+      useRootNavigator: false,
+      builder: (context) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: const Row(
           children: [
@@ -251,13 +276,18 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         content: Text('Are you sure you want to delete "${note.title}"?'),
         actions: [
           TextButton(
-            onPressed: () => Navigator.of(context).pop(),
+            onPressed: () {
+              if (!mounted) return;
+              Navigator.of(context).pop();
+            },
             child: const Text('Cancel'),
           ),
           ElevatedButton(
             onPressed: () {
               note.delete();
+              if (!mounted) return;
               Navigator.of(context).pop();
+              if (!mounted) return;
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
                   content: Text('Note deleted!'),
@@ -277,8 +307,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     List<Note> notes = notesBox.values.toList();
 
     // Sort by updated date (newest first)
-    notes.sort((a, b) => (b.updatedAt ?? b.createdAt ?? DateTime.now())
-        .compareTo(a.updatedAt ?? a.createdAt ?? DateTime.now()));
+    notes.sort(
+      (a, b) => (b.updatedAt ?? b.createdAt ?? DateTime.now()).compareTo(
+        a.updatedAt ?? a.createdAt ?? DateTime.now(),
+      ),
+    );
 
     // Filter by category
     if (selectedCategory != 'All') {
@@ -287,9 +320,15 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
     // Filter by search query
     if (searchQuery.isNotEmpty) {
-      notes = notes.where((note) =>
-      note.title.toLowerCase().contains(searchQuery.toLowerCase()) ||
-          note.description.toLowerCase().contains(searchQuery.toLowerCase())).toList();
+      notes = notes
+          .where(
+            (note) =>
+                note.title.toLowerCase().contains(searchQuery.toLowerCase()) ||
+                note.description.toLowerCase().contains(
+                  searchQuery.toLowerCase(),
+                ),
+          )
+          .toList();
     }
 
     return notes;
@@ -409,7 +448,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                         });
                       },
                       backgroundColor: Colors.white,
-                      selectedColor: Theme.of(context).primaryColor.withOpacity(0.2),
+                      selectedColor: Theme.of(
+                        context,
+                      ).primaryColor.withOpacity(0.2),
                       checkmarkColor: Theme.of(context).primaryColor,
                     ),
                   );
@@ -458,42 +499,37 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 return SliverPadding(
                   padding: const EdgeInsets.all(16),
                   sliver: SliverGrid(
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      childAspectRatio: 0.8,
-                      crossAxisSpacing: 12,
-                      mainAxisSpacing: 12,
-                    ),
-                    delegate: SliverChildBuilderDelegate(
-                          (context, index) {
-                        final note = filteredNotes[index];
-                        return NoteTile(
-                          note: note,
-                          onEdit: () => showNoteDialog(note: note, index: index),
-                          onDelete: () => deleteNote(note),
-                          isGridView: true,
-                        );
-                      },
-                      childCount: filteredNotes.length,
-                    ),
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          childAspectRatio: 0.8,
+                          crossAxisSpacing: 12,
+                          mainAxisSpacing: 12,
+                        ),
+                    delegate: SliverChildBuilderDelegate((context, index) {
+                      final note = filteredNotes[index];
+                      return NoteTile(
+                        note: note,
+                        onEdit: () => showNoteDialog(note: note, index: index),
+                        onDelete: () => deleteNote(note),
+                        isGridView: true,
+                      );
+                    }, childCount: filteredNotes.length),
                   ),
                 );
               } else {
                 return SliverPadding(
                   padding: const EdgeInsets.all(16),
                   sliver: SliverList(
-                    delegate: SliverChildBuilderDelegate(
-                          (context, index) {
-                        final note = filteredNotes[index];
-                        return NoteTile(
-                          note: note,
-                          onEdit: () => showNoteDialog(note: note, index: index),
-                          onDelete: () => deleteNote(note),
-                          isGridView: false,
-                        );
-                      },
-                      childCount: filteredNotes.length,
-                    ),
+                    delegate: SliverChildBuilderDelegate((context, index) {
+                      final note = filteredNotes[index];
+                      return NoteTile(
+                        note: note,
+                        onEdit: () => showNoteDialog(note: note, index: index),
+                        onDelete: () => deleteNote(note),
+                        isGridView: false,
+                      );
+                    }, childCount: filteredNotes.length),
                   ),
                 );
               }
@@ -501,9 +537,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           ),
 
           // Bottom padding for FAB
-          const SliverToBoxAdapter(
-            child: SizedBox(height: 80),
-          ),
+          const SliverToBoxAdapter(child: SizedBox(height: 80)),
         ],
       ),
 
